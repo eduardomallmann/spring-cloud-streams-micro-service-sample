@@ -1,31 +1,23 @@
 package com.cloud.stream.study.payment.payment;
 
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Sink;
-import org.springframework.cloud.stream.messaging.Source;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
 @Service
-@EnableBinding(value = {Sink.class, Source.class})
 public class OrderPaymentService {
 
     private final OrderPaymentRepository paymentRepository;
-    private final Source source;
+    private final MessagingController messagingController;
 
-    public OrderPaymentService(OrderPaymentRepository paymentRepository, Source source) {
+    public OrderPaymentService(OrderPaymentRepository paymentRepository, MessagingController messagingController) {
         this.paymentRepository = paymentRepository;
-        this.source = source;
+        this.messagingController = messagingController;
     }
 
-    @StreamListener(Sink.INPUT)
-    public void saveOrder(final OrderPayment order) {
-        this.paymentRepository.saveAndFlush(order);
+    public OrderPayment saveOrder(final OrderPayment order) {
+        return this.paymentRepository.saveAndFlush(order);
     }
 
     public OrderPayment informPayment(final Long id) {
@@ -38,14 +30,9 @@ public class OrderPaymentService {
 
         this.paymentRepository.saveAndFlush(order);
 
-        this.sendMessage(order);
+        this.messagingController.sendMessage(order);
 
         return order;
-    }
-
-    private void sendMessage(OrderPayment order) {
-        Message<OrderPayment> message = MessageBuilder.withPayload(order).build();
-        source.output().send(message);
     }
 
     public List<OrderPayment> getAllPayments() {
