@@ -9,15 +9,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableBinding(Source.class)
-public class OrderOutMessaging {
+public class MessagingController {
 
     private final Source source;
 
-    public OrderOutMessaging(Source source) {
+    public MessagingController(Source source) {
         this.source = source;
     }
 
     public void processOrder(Order order) {
+        order.setId(null);
         Message<Order> message = MessageBuilder.withPayload(order).build();
         source.output().send(message);
     }

@@ -1,0 +1,9 @@
+server.port: 8181
+spring:
+  cloud:
+    stream:
+      bindings:
+        order:
+          destination: order
+        payment:
+          destination: payment

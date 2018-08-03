@@ -9,11 +9,9 @@ import java.util.List;
 public class OrderPaymentService {
 
     private final OrderPaymentRepository paymentRepository;
-    private final MessagingController messagingController;
 
-    public OrderPaymentService(OrderPaymentRepository paymentRepository, MessagingController messagingController) {
+    public OrderPaymentService(OrderPaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
-        this.messagingController = messagingController;
     }
 
     public OrderPayment saveOrder(final OrderPayment order) {
@@ -29,8 +27,6 @@ public class OrderPaymentService {
         order.setPayed(true);
 
         this.paymentRepository.saveAndFlush(order);
-
-        this.messagingController.sendMessage(order);
 
         return order;
     }

@@ -14,14 +14,22 @@ import java.util.List;
 public class OrderPaymentController {
 
     private final OrderPaymentService service;
+    private final MessagingController messagingController;
 
-    public OrderPaymentController(OrderPaymentService service) {
+
+    public OrderPaymentController(OrderPaymentService service, MessagingController messagingController) {
         this.service = service;
+        this.messagingController = messagingController;
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OrderPayment> updateOrder(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.service.informPayment(id));
+
+        OrderPayment order = this.service.informPayment(id);
+
+        this.messagingController.sendMessage(order);
+
+        return ResponseEntity.ok(order);
     }
 
     @GetMapping
